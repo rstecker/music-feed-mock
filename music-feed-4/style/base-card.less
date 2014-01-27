@@ -1,0 +1,162 @@
+@import 'core.less';
+
+@darker_text: #3d3d3d;
+@lighter_text: #989898;
+@rdio_blue: #008FD5;
+@column_1: 170px;
+@column_2: 370px;
+@column_3: 570px;
+@column_4: 770px;
+
+.link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+body {
+  font-family: "Whitney 5sm", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+.story {
+  clear: both;
+  width: 1220px;
+  padding-bottom: 100px;
+  //border: 1px solid black;
+  float: right;
+  &.odd {
+    background-color: #f2f4f5;
+  }
+}
+
+.header {
+  margin: 70px 0px;
+  text-align: center;
+  .icon {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    img {
+      width: 100%;
+      margin-bottom: 8px;
+      border-radius: 60%;
+      .box-shadow(@image-shadow);
+    }
+    &.meter{
+      background: url('../img/new/icon-meter.png');
+    }
+    &.lightbulb{
+      background: url('../img/new/icon-lightbulb.png');
+    }
+    &.calendar{
+      background: url('../img/new/icon-calendar.png');
+    }
+    &.person{
+      background: url('../img/new/icon-person.png');
+    }
+    &.station{
+      background: url('../img/new/icon-station.png');
+    }
+  }
+  .title {
+    color: @darker_text;
+    font-size: 18px;
+  }
+  .subtitle {
+    color: @lighter_text;
+    font-size: 12px;
+  }
+  .special {
+    font-size: 10px;
+    color: @rdio_blue;
+    text-transform: uppercase;
+  }
+}
+
+
+.popular {
+  .album {
+    margin-left: 230px;
+    width: @column_4;
+    height: 331px;
+    overflow: hidden;
+    img {
+      width: 100%;
+      .box-shadow(@image-shadow);
+    }
+  }
+  &.story {
+    padding-bottom: 0px;
+  }
+}
+
+.music-block:before, .album:before {
+  content: url('../img/hover-controls.png');
+  width: 154px;
+  height: 76px;
+  position: absolute;
+  display: none;
+}
+.music-block.big:before {
+  padding-left: 120px;
+  padding-top: 294px;
+}
+.album.clipped:before {
+  padding-left: 312px;
+  padding-top: 256px;
+}
+.music-block.small:before, .comment .album:before {
+  padding-left: 8px;
+  padding-top: 96px;
+}
+.music-block:hover:before, .album:hover:before {
+  display: block;
+}
+
+.comment {
+  .album {
+    position: absolute;
+    margin-left: 230px;
+    width: @column_1;
+    img {
+      width: 100%;
+      .box-shadow(@image-shadow);
+    }
+  }
+  .comment-body {
+    position: relative;
+    margin-left: 430px;
+    width: @column_3;
+    min-height: @column_1;
+    font-size: 18px;
+    color: @darker_text;
+    .timestamp {
+      font-size: 10px;
+      color: @lighter_text;
+    }
+  }
+}
+
+.music-block {
+  padding: 0px 13px;
+  margin-bottom: 30px;
+  display: inline-block;
+  &.big {
+    width: @column_2;
+  }
+  &.small {
+    width: @column_1;
+  }
+  img {
+    .box-shadow(@image-shadow);
+    width: 100%;
+  }
+  .title {
+    font-size: 14px;
+    color: #3d3d3d;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: #989898;
+  }
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Music Feed 4</title>
+    <link rel="stylesheet" type="text/css" href="../lib/normalize.css">
+    <link rel="stylesheet" type="text/css" href="../lib/rdio-utils.css">
+    <link rel="stylesheet" type="text/css" href="style/fonts.css">
+    <link rel="stylesheet/less" type="text/css" href="style/main.less">
+    <link rel="stylesheet/less" type="text/css" href="style/normal-item.less">
+    <link rel="stylesheet/less" type="text/css" href="style/base-card.less">
+
+    <!-- Register your app at http://www.rdio.com/developers/create/ and replace client_id below with yours  -->
+    <script src="https://rdio.com/api/api.js?client_id=dc0vubtijKSvCWzFQmMseA"></script>
+    <!--<script src="http://rdio.localhost:8000/api/api.js?client_id=3C5sRdIYmnO2LOXP7A206g"></script>-->
+
+    <script src="../lib/jquery-1.9.1.min.js"></script>
+    <script src="../lib/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="../lib/underscore-1.4.4.min.js"></script>
+    <script src="../lib/less-1.3.0.min.js"></script>
+    <script src="../lib/rdio-utils.js"></script>
+    <script src="../lib/zot.js"></script>
+    <script src="../lib/jquery.color.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/color-picking.js"></script>
+
+
+
+
+    <script id="heavyRotation-template" type="text/template">
+      <div class="header">
+        <div class="icon meter"></div>
+        <div class="title"><%= title %></div>
+        <div class="subtitle special"><%= subtitle %></div>
+      </div>
+      <% _.each(entries, function(v, i) { %>
+        <div class="music-block <% if (i < 3) { %>big<% } else { %>small<% } %>">
+          <img src="<%= v.icon %>">
+          <div class="title truncated-line"><%= v.title %></div>
+          <div class="subtitle truncated-line"><%= v.subtitle %></div>
+        </div>
+      <% }); %>
+    </script>
+
+    <script id="comment-template" type="text/template">
+      <div class="header">
+        <div class="icon"><img src="<%= userIcon %>"></div>
+        <div class="title"><%= title %></div>
+        <div class="subtitle"><%= subtitle %></div>
+      </div>
+      <div class="album"><img src="<%= albumIcon %>"></div>
+      <div class="comment-body">
+        <div class="words"><%= comment %></div>
+        <div class="timestamp"><%= timestamp %></div>
+      </div>
+    </script>
+
+    <script id="popular-template" type="text/template">
+      <div class="header">
+        <div class="icon <%= icon %>">
+          <% if(userIcon) { %>
+            <img src="<%= userIcon %>">
+          <% } %>
+        </div>
+        <div class="title"><%= title %></div>
+        <div class="subtitle"><%= subtitle %></div>
+      </div>
+      <div class="album clipped"><img src="<%= albumIcon %>"></div>
+    </script>
+
+    <script id="generic-template" type="text/template">
+      <div class="header">
+        <div class="icon <%= icon %>">
+          <% if(userIcon) { %>
+            <img src="<%= userIcon %>">
+          <% } %>
+        </div>
+        <div class="title"><%= title %></div>
+        <div class="subtitle"><%= subtitle %></div>
+      </div>
+      <% _.each(entries, function(v, i) { %>
+        <div class="music-block big">
+          <img src="<%= v.icon %>">
+          <div class="title truncated-line"><%= v.title %></div>
+          <div class="subtitle truncated-line"><%= v.subtitle %></div>
+          <div class="subtitle tracks"><%= v.tracks %></div>
+        </div>
+      <% }); %>
+    </script>
+
+
+    <script id="no-auth-template" type="text/template">
+      <p>To get started you will need to <button class="auth">authorize this app</button></p>
+    </script>
+
+  </head>
+  <body>
+    <div class="main-content">
+      <div class="page-title large-text">Music Feed 4</div>
+      <div class="error"></div>
+    </div>
+  </body>
+</html>
