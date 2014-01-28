@@ -19,6 +19,8 @@
       this._columns = -1;
 
       this.dummyText = 'If you have a problem if no one else can help and if you can find them maybe you can hire The A-Team. I have always wanted to have a neighbor just like you. I\'ve always wanted to live in a neighborhood with you. Space. The final frontier. These are the voyages of the Starship Enterprise. These Happy Days are yours and mine Happy Days. Movin\' on up to the east side. We finally got a piece of the pie. Michael Knight a young loner on a crusade to champion the cause of the innocent. The helpless. The powerless in a world of criminals who operate above the law. As long as we live its you and me baby. There ain\'t nothin\' wrong with that. And you know where you were then. Girls were girls and men were men. Mister we could use a man like Herbert Hoover again!';
+      // mock strings for organization info
+      this.belongsTo = ['Music Magazine', 'of My Morning Jacket', 'Singer and TV Host', 'Rdio'];
 
       R.ready(function() {
         if (R.authenticated()) {
@@ -97,14 +99,21 @@
           icon: this.correctIcon(a.icon),
           title: a.name,
           subtitle: a.artist
-        }
+        };
     },
     _playlistsDataExtract: function(p) {
       return { 
           icon: this.correctIcon(p.icon),
           title: p.name,
           subtitle: 'by ' + p.owner
-        }
+        };
+    },
+    _peopleDataExtract: function(p) {
+      return {
+        icon: this.correctIcon(p.icon),
+        title: p.firstName + ' ' + p.lastName,
+        subtitle: _.sample(this.belongsTo)
+      };
     },
     generateHeavyRotation: function(body, albums, playlists) {
       var data = {
@@ -173,12 +182,29 @@
       var el = Main.template('generic', data).appendTo(body);
       return el;
     },
+
+    generatePeopleToFollow: function(body, people) {
+      var data = {
+        title: 'People to follow',
+        subtitle: 'Rdio is better with friends',
+        entries: []
+      };
+      people = _.shuffle(people);
+      for (var i = 0; i < 6; i++) {
+        data.entries.push(this._peopleDataExtract(people[i]));
+      }
+      var el = Main.template('people', data).appendTo(body);
+      return el;
+    },
+
     makeOddElement: function(body, people, albums, playlists, stations) {
-      switch (this.random(0, 2)) {
+      switch (this.random(0, 3)) {
         case 0:
           return this.generatePopular(body, albums);
         case 1:
           return this.generateReview(body, people, albums, playlists);
+        case 2:
+          return this.generatePeopleToFollow(body, people);
       }
       
     },
