@@ -10,7 +10,7 @@
     <link rel="stylesheet/less" type="text/css" href="style/base-card.less">
 
     <!-- Register your app at http://www.rdio.com/developers/create/ and replace client_id below with yours  -->
-    <script src="https://rdio.com/api/api.js?client_id=dc0vubtijKSvCWzFQmMseA"></script>
+    <script src="https://rdio.com/api/api.js?client_id=NYAX608CzAD-0EIYqVpsAA"></script>
     <!--
       RS: dc0vubtijKSvCWzFQmMseA
       AK: NYAX608CzAD-0EIYqVpsAA
@@ -33,7 +33,6 @@
       <div class="header">
         <div class="icon meter"></div>
         <div class="title"><%= title %></div>
-        <div class="subtitle special"><%= subtitle %></div>
       </div>
       <% _.each(entries, function(v, i) { %>
         <div class="music-block <% if (i < 3) { %>big<% } else { %>small<% } %>">
@@ -45,15 +44,26 @@
     </script>
 
     <script id="comment-template" type="text/template">
-      <div class="header">
-        <div class="icon"><img src="<%= userIcon %>"></div>
-        <div class="title"><%= title %></div>
-        <div class="subtitle"><%= subtitle %></div>
-      </div>
-      <div class="album"><img src="<%= albumIcon %>"></div>
-      <div class="comment-body">
-        <div class="words"><%= comment %></div>
-        <div class="timestamp"><%= timestamp %></div>
+      <div class="content">
+        <div class="album big"><img src="<%= albumIcon %>"></div>
+        <div class="comment-body">
+          <div class="icon"><img src="<%= userIcon %>" class="link"></div>
+          <div class="words"><%= comment %></div>
+          <% if (isTrack) { %>
+            <div class="track">
+              <span class="play-button"></span>
+              <span class="name"><a href="#"><%=track.name%></a></span>
+              <span class="duration">(<%=track.durationFormatted%>)</span>
+              <hr>
+            </div>
+          <% } %>
+          <div class="timestamp">
+            <a href="#">Like</a> <span class="separator">|</span>
+            <a href="#">Reply</a> <span class="separator">|</span>
+            <a href="#"><%= timestamp %></a> by
+            <a href="#"><%= author %></a>
+          </div>
+        </div>
       </div>
     </script>
 
@@ -65,16 +75,14 @@
           <% } %>
         </div>
         <div class="title"><%= title %></div>
-        <div class="subtitle"><%= subtitle %></div>
       </div>
-      <div class="album clipped"><img src="<%= albumIcon %>"></div>
+      <div class="album clipped content"><img src="<%= albumIcon %>"></div>
     </script>
 
     <script id="people-template" type="text/template">
       <div class="header">
         <div class="icon person"></div>
         <div class="title"><%= title %></div>
-        <div class="subtitle special"><%= subtitle %></div>
       </div>
       <% _.each(entries, function(v, i) { %>
         <div class="people-block">
@@ -91,22 +99,22 @@
       <div class="header">
         <div class="icon <%= icon %>">
           <% if(userIcon) { %>
-            <img src="<%= userIcon %>">
+            <img class="link" src="<%= userIcon %>">
           <% } %>
         </div>
         <div class="title"><%= title %></div>
-        <div class="subtitle"><%= subtitle %></div>
       </div>
+      <div class="content">
       <% _.each(entries, function(v, i) { %>
-        <div class="music-block big">
+        <div class="music-block <%= size %>">
           <img src="<%= v.icon %>">
           <div class="title truncated-line"><%= v.title %></div>
           <div class="subtitle truncated-line"><%= v.subtitle %></div>
-          <div class="subtitle tracks"><%= v.tracks %></div>
+          <div class="subtitle tracks"><%= v.tracksCount %></div>
         </div>
       <% }); %>
+      </div>
     </script>
-
 
     <script id="no-auth-template" type="text/template">
       <p>To get started you will need to <button class="auth">authorize this app</button></p>

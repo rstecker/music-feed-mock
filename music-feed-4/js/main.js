@@ -1,6 +1,8 @@
 /*globals rdioUtils, Main, R, zot, console */
 
 (function() {
+  var IMAGE_SERVER_URL = 'http://dev06.720.rdio.com:8080/_is/';
+  var COLUMN_WIDTH = 180;
 
   // ----------
   window.Main = {
@@ -98,7 +100,8 @@
       return { 
           icon: this.correctIcon(a.icon),
           title: a.name,
-          subtitle: a.artist
+          subtitle: a.artist,
+          tracksCount: a.tracks.length + ' tracks'
         };
     },
     _playlistsDataExtract: function(p) {
@@ -113,6 +116,14 @@
         icon: this.correctIcon(p.icon),
         title: p.firstName + ' ' + p.lastName,
         subtitle: _.sample(this.belongsTo)
+      };
+    },
+    _stationDataExtract: function(s) {
+      var artistNames = _.map(s.artists, function(a) { return a.name; });
+      return {
+        icon: this.correctIcon(s.icon),
+        title: s.name,
+        relatedArtists: artistNames
       };
     },
     generateHeavyRotation: function(body, albums, playlists) {
@@ -133,7 +144,7 @@
       var el = Main.template('heavyRotation', data).appendTo(body);
       return el;
     },
-    generateReview: function(body, people, albums, playlists) {
+    generateReview: function(body, people, albums, playlists, isTrack) {
       user = _.shuffle(people)[0];
       album = _.shuffle(albums)[0];
       data = {
@@ -141,42 +152,78 @@
         title: user.firstName + ' ' + user.lastName + ' reviewed an album',
         subtitle: album.name + ' - ' + album.artist,
         albumIcon: this.correctIcon(album.icon),
-        comment: 'Pariatur Truffaut delectus chia distillery fingerstache photo booth. Pork belly organic yr pariatur, beard YOLO kale chips pickled. Mixtape minim XOXO kitsch ex photo booth esse.',
-        timestamp: '49 mins ago'
+        comment: '"Pariatur Truffaut delectus chia distillery fingerstache photo booth. Pork belly organic yr pariatur, beard YOLO kale chips pickled. Mixtape minim XOXO kitsch ex photo booth esse."',
+        timestamp: '49 mins ago',
+        author: user.firstName + ' ' + user.lastName,
+        isTrack: isTrack
       }
       if (Math.random() < .2) {
-        data.comment = 'Odio mumblecore quinoa, single-origin coffee four loko kitsch laboris ugh. Excepteur nulla non tofu in, cillum Neutra chillwave organic hashtag ea Brooklyn meggings. Forage craft beer veniam artisan, eiusmod sapiente cardigan Odd Future in accusamus narwhal nostrud hella. Meh Godard dreamcatcher VHS. Mixtape chambray aliqua, mollit elit biodiesel Shoreditch assumenda hashtag deep v forage adipisicing cillum salvia ethnic. Pop-up tofu Schlitz blog seitan. Hoodie bitters cupidatat Intelligentsia adipisicing typewriter.';
+        data.comment = '"Odio mumblecore quinoa, single-origin coffee four loko kitsch laboris ugh. Excepteur nulla non tofu in, cillum Neutra chillwave organic hashtag ea Brooklyn meggings."';
       } else if (Math.random() < .2) {
-        data.comment = 'Food truck bespoke Pitchfork';
+        data.comment = '"Food truck bespoke Pitchfork"';
+      }
+      if (isTrack) {
+        data.track = album.tracks[this.random(0, album.tracks.length)];
+        data.track.durationFormatted = rdioUtils.formatSeconds(data.track.duration);
       }
       var el = Main.template('comment', data).appendTo(body);
+
+      if (this.alternate) {
+        el.addClass('alternate');
+      }
+      this.alternate = !this.alternate;
+      this.makeBlurBackground(el, data.albumIcon);
+
+      var commentBody = el.find('.comment-body');
+      // vertical align via js
+      commentBody.css({
+        top: (COLUMN_WIDTH * 2 - commentBody.height()) / 2
+      });
       return el;
     },
+
     generatePopular: function(body, albums) {
       album = _.shuffle(albums)[0];
       data = {
         userIcon: false,
-        icon: 'meter',
-        title: 'Popular with your friends',
-        subtitle: album.name + ' - ' + album.artist,
+        icon: 'history',
+        title: 'You loved this album a year ago. Give it another listen.',
         albumIcon: this.correctIcon(album.icon)
       }
       var el = Main.template('popular', data).appendTo(body);
+      this.makeBlurBackground(el, data.albumIcon);
       return el;
     },
-    generateGenericReleases: function(body, albums, title, subtitle, icon, userIcon) {
-      albums = _.shuffle(albums);
+
+    generateGenericGrid: function(body, entries, title, icon, userIcon, size) {
+      entries = _.shuffle(entries);
       data = { 
         title: title,
-        subtitle: subtitle,
         icon: icon,
         userIcon: userIcon,
-        entries: []
+        entries: [],
+        size: (size) ? size : 'big'
       }
-      for (var i = 0; i < 3; ++i) {
-        var e = this._albumDataExtract(albums[i]);
-        console.warn(albums[i]);
-        e.tracks = albums[i].length + ' tracks';
+      var transformFunction;
+      var entryType = entries[0].type;
+      switch (entryType) {
+        case 'a': 
+          data.type = 'album';
+          transformFunction = this._albumDataExtract;
+          break;
+        case 'rr':
+          data.type = 'station';
+          transformFunction = this._stationDataExtract;
+          break;
+        case 's':
+          data.type = 'user';
+          transformFunction = this._peopleDataExtract;
+          break;
+      }
+      var total = (data.size == 'big') ? 3 : 4;
+      for (var i = 0; i < total; ++i) {
+        var e = transformFunction.call(this, entries[i]);
+        console.warn(entries[i]);
         data.entries.push(e);
       }
       var el = Main.template('generic', data).appendTo(body);
@@ -185,8 +232,7 @@
 
     generatePeopleToFollow: function(body, people) {
       var data = {
-        title: 'People to follow',
-        subtitle: 'Rdio is better with friends',
+        title: 'Follow friends and influencers to discover music.',
         entries: []
       };
       people = _.shuffle(people);
@@ -197,37 +243,47 @@
       return el;
     },
 
-    makeOddElement: function(body, people, albums, playlists, stations) {
-      switch (this.random(0, 3)) {
+    // background color with padding
+    makeLookA: function(body, people, albums, playlists, stations) {
+      switch (this.random(0, 4)) {
         case 0:
-          return this.generatePopular(body, albums);
+          return this.generateReview(body, people, albums, playlists).addClass('single-album');
         case 1:
-          return this.generateReview(body, people, albums, playlists);
+          return this.generateReview(body, people, albums, playlists, true).addClass('single-album');
         case 2:
+          return this.generateGenericGrid(body, stations, 'Stations your friends have on their radar.', 'station', null, 'small');
+        case 3:
+          return this.generatePopular(body, albums);
+      }
+    },
+
+    // white background with full width
+    makeLookB: function(body, people, albums, playlists, stations) {
+      switch (this.random(0, 5)) {
+        case 0:
+        case 1:
+          var seedAlbum = _.shuffle(albums)[0];
+          return this.generateGenericGrid(body, albums, 'Discover more artists like <a href="#">' + seedAlbum.artist + '</a>.', null, seedAlbum.icon);
+        case 2:
+        case 3:
+          var seedUser = _.shuffle(people)[0];
+          return this.generateGenericGrid(body, albums, 'The albums <a href="#">' + seedUser.firstName + '</a> keeps coming back to.', null, seedUser.icon);
+        case 4:
+          // don't want to show this too frequently
           return this.generatePeopleToFollow(body, people);
       }
-      
     },
-    makeEvenElement: function(body, people, albums, playlists, stations) {
-      switch (this.random(0, 3)) {
-        case 0:
-          user = _.shuffle(people)[0];
-          name = user.firstName + " " + user.lastName;
-          icon = this.correctIcon(user.icon);
-          return this.generateGenericReleases(body, albums, name, 'Has been playing this music', '', icon);
-        case 1:
-          return this.generateGenericReleases(body, albums, 'New Releases', 'From artists in your collection', 'calendar', false);
-        case 2:
-          return this.generateGenericReleases(body, albums, 'You listened to '+ _.shuffle(albums)[0].artist, 'You might also like these albums', 'lightbulb', false);
-      }
-      console.error("how did this fall through?");
-    },
+
     generatePage: function(people, albums, playlists, stations) {
       var body = $('body');
-      this.generateHeavyRotation(body, albums, playlists).addClass('story');
-      for (var i = 0; i < 4; ++i) {
-        this.makeOddElement(body, people, albums, playlists, stations).addClass('story').addClass('odd');
-        this.makeEvenElement(body, people, albums, playlists, stations).addClass('story');
+      //TODO: after design is finalized
+      //this.generateHeavyRotation(body, albums, playlists).addClass('story');
+
+      this.alternate = false;
+
+      for (var i = 0; i < 5; ++i) {
+        this.makeLookA(body, people, albums, playlists, stations).addClass('story look-A');
+        this.makeLookB(body, people, albums, playlists, stations).addClass('story look-B');
       }
     },
     // ----------
@@ -295,9 +351,8 @@
         method: 'getStations',
         content: {
           start: 5,
-          count: 20
-          //'[{"field":"description","extras":["*.WEB"]},{"field":"artists","extras":["*.WEB","-*","name","url"]}]'
-          //{"field":"description","extras":["*.WEB"]},{"field":"artists","extras":["*.WEB","-*","name","url"]}
+          count: 20,
+          extras: ['artists'] // exclusion doesn't seem to work here.. fetch all!
         },
         success: function(response) {
           self.log('got stations');
@@ -336,6 +391,7 @@
     random: function(low, high) {
       return low + Math.floor(Math.random() * (high - low));
     },
+
     correctIcon: function(iconSrc) {
       if (!iconSrc) {
         return iconSrc;
@@ -343,6 +399,21 @@
       iconSrc = iconSrc.replace(/w=200&h=200/, 'w=400&h=400');
       iconSrc = iconSrc.replace(/200\.jpg/, '400.jpg');
       return iconSrc;
+    },
+
+    makeBlurBackground: function(el, imageUrl) {
+      el.css({
+        backgroundImage: 'url(' + this.getBlurImage(imageUrl) + ')',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover'
+      }).addClass('blur-background');
+      el.append($('<div class="overlay"></div>'));
+    },
+
+    getBlurImage: function(imageUrl) {
+      var a = document.createElement('a');
+      a.href = imageUrl;
+      return IMAGE_SERVER_URL + '?m=' + a.pathname + '&w=1200&h=1200&b=10&d=2';
     }
   };
 

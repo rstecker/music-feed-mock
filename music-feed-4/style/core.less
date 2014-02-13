@@ -17,3 +17,20 @@
   background-clip: padding-box; /* Android 2.2+, Chrome, Firefox 4+, IE 9+, iOS 4+, Opera 10.50+, Safari 4+ */
 }
 
+.over-art-text-shadow() {
+  text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.1);
+}
+
+.opacity(@val: 0) {
+  @ie_val: @val * 100;
+  opacity: @val;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=@{ie_val})";
+}
+
+.headline-font() {
+  font-family: "Whitney 4r", Helvetica, Arial, sans-serif;
+}
+
+.regular-font() {
+  font-family: "Whitney SSm 5r", Helvetica, Arial, sans-serif;
+}
