@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Music Feed 4</title>
+    <title>Music Feed 7</title>
     <link rel="stylesheet" type="text/css" href="../lib/normalize.css">
     <link rel="stylesheet" type="text/css" href="../lib/rdio-utils.css">
     <link rel="stylesheet" type="text/css" href="style/fonts.css">
@@ -14,6 +14,7 @@
     <!--
       RS: dc0vubtijKSvCWzFQmMseA
       AK: NYAX608CzAD-0EIYqVpsAA
+      AK (live): Y9GkCzclhKCX3xywe9kCMQ
     -->
 
     <script src="../lib/jquery-1.9.1.min.js"></script>
@@ -98,7 +99,7 @@
     <script id="generic-template" type="text/template">
       <div class="header">
         <div class="icon <%= icon %>">
-          <% if(userIcon) { %>
+          <% if (userIcon) { %>
             <img class="link" src="<%= userIcon %>">
           <% } %>
         </div>
@@ -109,8 +110,14 @@
         <div class="music-block <%= size %>">
           <img src="<%= v.icon %>">
           <div class="title truncated-line"><%= v.title %></div>
-          <div class="subtitle truncated-line"><%= v.subtitle %></div>
-          <div class="subtitle tracks"><%= v.tracksCount %></div>
+          <% if (v.relatedArtists) { %>
+            <div class="subtitle">
+              <%= v.relatedArtists %>
+            </div>
+          <% } else { %>
+            <div class="subtitle truncated-line"><%= v.subtitle %></div>
+            <div class="subtitle tracks"><%= v.tracksCount %></div>
+          <% } %>
         </div>
       <% }); %>
       </div>
@@ -123,7 +130,7 @@
   </head>
   <body>
     <div class="main-content">
-      <div class="page-title large-text">Music Feed 4</div>
+      <div class="page-title large-text">Music Feed 7</div>
       <div class="error"></div>
     </div>
   </body>

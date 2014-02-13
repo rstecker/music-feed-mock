@@ -23,6 +23,7 @@
       this.dummyText = 'If you have a problem if no one else can help and if you can find them maybe you can hire The A-Team. I have always wanted to have a neighbor just like you. I\'ve always wanted to live in a neighborhood with you. Space. The final frontier. These are the voyages of the Starship Enterprise. These Happy Days are yours and mine Happy Days. Movin\' on up to the east side. We finally got a piece of the pie. Michael Knight a young loner on a crusade to champion the cause of the innocent. The helpless. The powerless in a world of criminals who operate above the law. As long as we live its you and me baby. There ain\'t nothin\' wrong with that. And you know where you were then. Girls were girls and men were men. Mister we could use a man like Herbert Hoover again!';
       // mock strings for organization info
       this.belongsTo = ['Music Magazine', 'of My Morning Jacket', 'Singer and TV Host', 'Rdio'];
+      this.sampleArtists = ['Gonzales', 'Hot Chip', 'Kavinsky', 'The Shins', 'Youth Lagoon'];
 
       R.ready(function() {
         if (R.authenticated()) {
@@ -119,7 +120,7 @@
       };
     },
     _stationDataExtract: function(s) {
-      var artistNames = _.map(s.artists, function(a) { return a.name; });
+      var artistNames = _.shuffle(this.sampleArtists).join(', ');
       return {
         icon: this.correctIcon(s.icon),
         title: s.name,
@@ -351,8 +352,7 @@
         method: 'getStations',
         content: {
           start: 5,
-          count: 20,
-          extras: ['artists'] // exclusion doesn't seem to work here.. fetch all!
+          count: 20
         },
         success: function(response) {
           self.log('got stations');
@@ -403,9 +403,7 @@
 
     makeBlurBackground: function(el, imageUrl) {
       el.css({
-        backgroundImage: 'url(' + this.getBlurImage(imageUrl) + ')',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover'
+        backgroundImage: 'url(' + this.getBlurImage(imageUrl) + ')'
       }).addClass('blur-background');
       el.append($('<div class="overlay"></div>'));
     },
@@ -413,7 +411,7 @@
     getBlurImage: function(imageUrl) {
       var a = document.createElement('a');
       a.href = imageUrl;
-      return IMAGE_SERVER_URL + '?m=' + a.pathname + '&w=1200&h=1200&b=10&d=2';
+      return IMAGE_SERVER_URL + '?m=' + a.pathname + '&w=1200&h=1200&b=20&d=2';
     }
   };
 
