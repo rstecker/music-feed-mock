@@ -189,7 +189,7 @@
         userIcon: false,
         icon: 'history',
         title: 'You loved this album a year ago. Give it another listen.',
-        albumIcon: this.correctIcon(album.icon)
+        albumIcon: this.correctIcon(album.icon, true)
       }
       var el = Main.template('popular', data).appendTo(body);
       this.makeBlurBackground(el, data.albumIcon);
@@ -392,12 +392,17 @@
       return low + Math.floor(Math.random() * (high - low));
     },
 
-    correctIcon: function(iconSrc) {
+    correctIcon: function(iconSrc, highRes) {
       if (!iconSrc) {
         return iconSrc;
       }
-      iconSrc = iconSrc.replace(/w=200&h=200/, 'w=400&h=400');
-      iconSrc = iconSrc.replace(/200\.jpg/, '400.jpg');
+      if (highRes) {
+        iconSrc = iconSrc.replace(/w=200&h=200/, 'w=1200&h=1200');
+        iconSrc = iconSrc.replace(/200\.jpg/, '1200.jpg');
+      } else {
+        iconSrc = iconSrc.replace(/w=200&h=200/, 'w=400&h=400');
+        iconSrc = iconSrc.replace(/200\.jpg/, '400.jpg');
+      }
       return iconSrc;
     },
 
@@ -411,7 +416,7 @@
     getBlurImage: function(imageUrl) {
       var a = document.createElement('a');
       a.href = imageUrl;
-      return IMAGE_SERVER_URL + '?m=' + a.pathname + '&w=1200&h=1200&b=20&d=2';
+      return IMAGE_SERVER_URL + '?m=' + a.pathname + '&w=1200&h=1200&b=50&d=2';
     }
   };
 
